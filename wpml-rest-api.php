@@ -45,6 +45,15 @@ function wpmlrestapi_init() {
 
 function wpmlrestapi_register_api_field($post_type) {
 	register_rest_field( $post_type,
+		'lang',
+		array(
+			'get_callback'    => 'wpmlrestapi_slug_get_post_locale',
+			'update_callback' => null,
+			'schema'          => null,
+		)
+	);
+
+	register_rest_field( $post_type,
 		'wpml_current_locale',
 		array(
 			'get_callback'    => 'wpmlrestapi_slug_get_current_locale',
@@ -107,4 +116,11 @@ function wpmlrestapi_slug_get_translations( $object, $field_name, $request ) {
  */
 function wpmlrestapi_slug_get_current_locale() {
 	return ICL_LANGUAGE_CODE;
+}
+
+function wpmlrestapi_slug_get_post_locale( $object, $field_name, $request ) {
+	$post_id = wpml_object_id_filter($object['id'], 'post', false, $language['language_code']);
+
+	$post_language_details = apply_filters( 'wpml_post_language_details', NULL, $post_id ) ;
+	return $post_language_details['language_code'];
 }
